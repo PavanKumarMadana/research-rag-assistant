@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Environment
+.env
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data
+/data/
+!/data/.gitkeep
+
+# Models
+/models/
+!/models/.gitkeep
+
+# Logs
+*.log
+
+# Vector Store
+/chromadb/
+
+# Uploads
+/uploads/
+
+# TensorFlow
+tf_model/
+*.h5
+*.pkl
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Docker
+.docker/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Deployment
+*.db
+*.sqlite3

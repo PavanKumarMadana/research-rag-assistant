@@ -1,0 +1,44 @@
+# ============================================
+# AI Research & Knowledge Assistant
+# Render Deployment Configuration
+# ============================================
+
+services:
+  - type: web
+    name: research-rag-backend
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ENVIRONMENT
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./data/research_assistant.db
+      - key: VECTOR_DB_PATH
+        value: ./data/chromadb
+      - key: UPLOAD_DIR
+        value: ./data/uploads
+      - key: MODEL_PATH
+        value: ./models/document_classifier
+      - key: LOG_FILE
+        value: ./data/app.log
+      - key: HF_HOME
+        value: ./data/huggingface
+      - key: LOG_LEVEL
+        value: INFO
+      - key: CORS_ORIGINS
+        value: '["*"]'
+    disk:
+      name: data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
+    healthCheckPath: /api/analytics/health
+    autoDeploy: true
