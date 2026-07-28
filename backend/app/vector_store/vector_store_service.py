@@ -4,10 +4,8 @@ Vector Store Service Module.
 Provides ChromaDB-based vector storage and retrieval operations.
 """
 
-from typing import Optional
+from typing import Any, Optional
 
-import chromadb
-from chromadb.config import Settings as ChromaSettings
 from loguru import logger
 
 from backend.app.core.config import settings
@@ -18,8 +16,8 @@ class VectorStoreService:
     """Service for vector storage and semantic search using ChromaDB."""
 
     _instance: Optional["VectorStoreService"] = None
-    _client: Optional[chromadb.Client] = None
-    _collection = None
+    _client: Optional[Any] = None
+    _collection: Optional[Any] = None
 
     def __new__(cls) -> "VectorStoreService":
         """Singleton pattern."""
@@ -36,6 +34,9 @@ class VectorStoreService:
     def _initialize(self) -> None:
         """Initialize ChromaDB client and collection."""
         try:
+            import chromadb
+            from chromadb.config import Settings as ChromaSettings
+
             logger.info(f"Initializing ChromaDB at: {settings.VECTOR_DB_PATH}")
             self._client = chromadb.PersistentClient(
                 path=settings.VECTOR_DB_PATH,

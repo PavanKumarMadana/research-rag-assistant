@@ -5,10 +5,9 @@ Provides text embedding generation using sentence-transformers.
 """
 
 import time
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
 from loguru import logger
 
 from backend.app.core.config import settings
@@ -18,7 +17,7 @@ class EmbeddingService:
     """Service for generating text embeddings."""
 
     _instance: Optional["EmbeddingService"] = None
-    _model: Optional[SentenceTransformer] = None
+    _model: Optional[Any] = None
 
     def __new__(cls) -> "EmbeddingService":
         """Singleton pattern to ensure only one model is loaded."""
@@ -36,6 +35,8 @@ class EmbeddingService:
         try:
             logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL}")
             start_time = time.time()
+            from sentence_transformers import SentenceTransformer
+
             self._model = SentenceTransformer(
                 settings.EMBEDDING_MODEL,
                 device="cpu",

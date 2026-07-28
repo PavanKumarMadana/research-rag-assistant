@@ -10,7 +10,6 @@ import time
 from typing import Optional
 
 import fitz  # PyMuPDF
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from loguru import logger
 
 from backend.app.core.config import settings
@@ -39,6 +38,8 @@ class DocumentProcessor:
         self.document_repo = document_repository
         self.vector_store = vector_store
         self.classification_service = classification_service
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
+
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=settings.CHUNK_SIZE,
             chunk_overlap=settings.CHUNK_OVERLAP,
