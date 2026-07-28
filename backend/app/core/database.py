@@ -14,15 +14,21 @@ from loguru import logger
 from backend.app.core.config import settings
 
 
-# Create async engine
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DATABASE_ECHO,
-    future=True,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-)
+engine_kwargs = {
+    "echo": settings.DATABASE_ECHO,
+    "future": True,
+    "pool_pre_ping": True,
+}
+
+if not settings.DATABASE_URL.startswith("sqlite"):
+    engine_kwargs.update({
+        "pool_size": 10,
+        "max_overflow": 20,
+    })
+
+# Create async engine. SQLite async engines use NullPool, so pool sizing options
+# are only applied to network databases such as PostgreSQL.
+engine = create_async_engine(settings.DATABASE_URL, **engine_kwargs)
 
 # Create async session factory
 async_session_factory = async_sessionmaker(
