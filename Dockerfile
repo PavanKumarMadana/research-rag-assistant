@@ -3,6 +3,15 @@
 # Production Dockerfile
 # ============================================
 
+FROM node:24-slim AS frontend-builder
+
+WORKDIR /frontend
+
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -28,6 +37,7 @@ RUN mkdir -p /app/data/uploads /app/data/chromadb /app/models
 
 # Copy application code
 COPY backend/ /app/backend/
+COPY --from=frontend-builder /frontend/dist /app/frontend/dist
 
 # Expose Render's default web service port. Render also injects PORT at runtime.
 EXPOSE 10000

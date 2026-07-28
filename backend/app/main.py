@@ -5,11 +5,13 @@ FastAPI application entry point with middleware, routers, and startup/shutdown e
 """
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
 from backend.app.core.config import settings
@@ -89,6 +91,13 @@ app.include_router(rag_routes.router)
 app.include_router(ml_routes.router)
 app.include_router(analytics_routes.router)
 
+FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+FRONTEND_INDEX = FRONTEND_DIST / "index.html"
+FRONTEND_ASSETS = FRONTEND_DIST / "assets"
+
+if FRONTEND_ASSETS.exists():
+    app.mount("/assets", StaticFiles(directory=FRONTEND_ASSETS), name="frontend-assets")
+
 
 @app.get("/")
 async def root():
@@ -97,6 +106,9 @@ async def root():
     Returns:
         dict: API information.
     """
+    if FRONTEND_INDEX.exists():
+        return FileResponse(FRONTEND_INDEX)
+
     return {
         "name": settings.APP_NAME,
         "version": settings.APP_VERSION,
@@ -147,6 +159,17 @@ async def api_info():
             },
         },
     }
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def frontend_fallback(full_path: str):
+    """Serve the React frontend for non-API paths when bundled in Docker."""
+    if (
+        FRONTEND_INDEX.exists()
+        and not full_path.startswith(("api", "docs", "redoc", "openapi.json", "assets"))
+    ):
+        return FileResponse(FRONTEND_INDEX)
+    return JSONResponse(status_code=404, content={"detail": "Not found"})
 
 
 if __name__ == "__main__":
